@@ -22,8 +22,15 @@ jobs:
       - run: npm run build
       # Trusted Publishing needs a recent npm CLI (>= 11.5.1).
       - run: npm install -g npm@latest
-      - run: npm publish --provenance --access public
+      - name: Publish (skip if this version is already on the registry)
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if npm view "renidly@$VERSION" version >/dev/null 2>&1; then
+            echo "renidly@$VERSION already published — nothing to do."
+          else
+            npm publish --provenance --access public
+          fi
       # If you use a token instead of Trusted Publishing, drop the id-token
-      # permission and the line above becomes:
+      # permission and add to the publish step:
       #   env:
       #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
