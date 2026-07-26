@@ -6,6 +6,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.1] — 2026-07-26
+
+### Added
+
+- Test suite (vitest, fully mocked — no network), README with usage examples
+  and badges, community & contributor docs (`CONTRIBUTING.md`,
+  `CODE_OF_CONDUCT.md`, `SECURITY.md`, `LICENSE`, `CHANGELOG.md`, issue/PR
+  templates), and CI + release workflows (npm Trusted Publishing).
+
+_No runtime or API changes._
+
 ## [0.1.0] — 2026-07-26
 
 Initial public release.
@@ -34,5 +45,6 @@ Initial public release.
 - Optional built-in client-side rate limiter (`autoRateLimit`).
 - Zero runtime dependencies; native `fetch`; ships both ESM and CommonJS.
 
-[Unreleased]: https://github.com/renidly/renidly-node/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/renidly/renidly-node/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/renidly/renidly-node/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/renidly/renidly-node/releases/tag/v0.1.0
