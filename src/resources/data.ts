@@ -8,7 +8,7 @@
  */
 import { BatchJob } from "../batch.js";
 import { RenidlyObject } from "../models.js";
-import { RenidlyList } from "../pagination.js";
+import { RenidlyListPromise } from "../pagination.js";
 import { RequestOptions } from "../transport.js";
 import {
   CompaniesEmployeesParams,
@@ -36,7 +36,7 @@ export class People extends BaseResource {
    * Filter professional records; cursor-paginated.
    * @example for await (const p of renidly.data.people.search({ title: "cto" })) console.log(p.headline);
    */
-  search(params: PeopleSearchParams = {}, options?: RequestOptions): Promise<RenidlyList> {
+  search(params: PeopleSearchParams = {}, options?: RequestOptions): RenidlyListPromise {
     return this.list(SVC, "GET", "/people/search", params as Record<string, unknown>, cursorPaginator, options);
   }
 
@@ -61,12 +61,12 @@ export class Companies extends BaseResource {
   }
 
   /** Filter organizations; cursor-paginated. */
-  search(params: CompaniesSearchParams = {}, options?: RequestOptions): Promise<RenidlyList> {
+  search(params: CompaniesSearchParams = {}, options?: RequestOptions): RenidlyListPromise {
     return this.list(SVC, "GET", "/companies/search", params as Record<string, unknown>, cursorPaginator, options);
   }
 
   /** List people who work (or worked) at an organization; cursor-paginated. */
-  employees(slug: string, params: CompaniesEmployeesParams = {}, options?: RequestOptions): Promise<RenidlyList> {
+  employees(slug: string, params: CompaniesEmployeesParams = {}, options?: RequestOptions): RenidlyListPromise {
     return this.list(SVC, "GET", "/companies/employees", { ...params, slug }, cursorPaginator, options);
   }
 
@@ -91,12 +91,12 @@ export class Institutions extends BaseResource {
   }
 
   /** Partial-match search on institution name (min 3 chars); page-paginated. */
-  search(name: string, params: { page?: number; limit?: number } = {}, options?: RequestOptions): Promise<RenidlyList> {
+  search(name: string, params: { page?: number; limit?: number } = {}, options?: RequestOptions): RenidlyListPromise {
     return this.list(SVC, "GET", "/institutions/search", { name, ...params }, pagePaginator, options);
   }
 
   /** Browse alumni / current students of an institution; page-paginated. */
-  alumni(normalizedName: string, params: InstitutionsAlumniParams = {}, options?: RequestOptions): Promise<RenidlyList> {
+  alumni(normalizedName: string, params: InstitutionsAlumniParams = {}, options?: RequestOptions): RenidlyListPromise {
     return this.list(SVC, "GET", "/institutions/alumni", { ...params, normalized_name: normalizedName }, pagePaginator, options);
   }
 }
@@ -108,14 +108,14 @@ export class Skills extends BaseResource {
   }
 
   /** Partial-match search on skill name (min 3 chars); page-paginated. */
-  search(name: string, params: { page?: number; limit?: number } = {}, options?: RequestOptions): Promise<RenidlyList> {
+  search(name: string, params: { page?: number; limit?: number } = {}, options?: RequestOptions): RenidlyListPromise {
     return this.list(SVC, "GET", "/skills/search", { name, ...params }, pagePaginator, options);
   }
 }
 
 export class JobChanges extends BaseResource {
   /** Search recent join / leave / title-change events; page-paginated. */
-  search(params: JobChangesSearchParams = {}, options?: RequestOptions): Promise<RenidlyList> {
+  search(params: JobChangesSearchParams = {}, options?: RequestOptions): RenidlyListPromise {
     return this.list(SVC, "GET", "/job-changes/search", params as Record<string, unknown>, pagePaginator, options);
   }
 }

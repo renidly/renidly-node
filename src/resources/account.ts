@@ -6,7 +6,7 @@
  * required trailing slash on `/k/` routes for you.
  */
 import { RenidlyObject } from "../models.js";
-import { RenidlyList } from "../pagination.js";
+import { RenidlyListPromise } from "../pagination.js";
 import { RequestOptions } from "../transport.js";
 import { BaseResource } from "./base.js";
 import { collection } from "./paginators.js";
@@ -43,7 +43,7 @@ export class Account extends BaseResource {
    * @example
    * for (const tier of await renidly.account.tiers()) console.log(tier.name);
    */
-  tiers(options?: RequestOptions): Promise<RenidlyList> {
+  tiers(options?: RequestOptions): RenidlyListPromise {
     return this.list(SVC, "GET", "/user/sub/tiers/", {}, collection("results"), options);
   }
 
@@ -51,7 +51,7 @@ export class Account extends BaseResource {
    * List per-route credit costs — no key required. Only routes whose cost is
    * not 1 are returned; anything absent costs 1 credit.
    */
-  routeCosts(options?: RequestOptions): Promise<RenidlyList> {
+  routeCosts(options?: RequestOptions): RenidlyListPromise {
     return this.list(SVC, "GET", "/credits/routes/costs/", {}, collection("routes"), options);
   }
 }

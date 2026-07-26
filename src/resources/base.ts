@@ -6,7 +6,7 @@
 import { ResolvedConfig, Service } from "../config.js";
 import { NotFoundError } from "../errors.js";
 import { RenidlyObject, attach } from "../models.js";
-import { RenidlyList } from "../pagination.js";
+import { RenidlyList, RenidlyListPromise, autoPagingPromise } from "../pagination.js";
 import { RequestOptions, Result, Transport } from "../transport.js";
 
 /** `(envelope, params) => [items, hasMore, nextParams, nextCursor]` */
@@ -45,24 +45,27 @@ export class BaseResource {
     return attach(r.data as object, r.lastResponse) as RenidlyObject;
   }
 
-  protected async list(
+  protected list(
     service: Service,
     method: string,
     path: string,
     params: Record<string, unknown>,
     paginator: Paginator,
     options?: RequestOptions,
-  ): Promise<RenidlyList> {
+  ): RenidlyListPromise {
     const p = params ?? {};
-    const r = await this.transport.request(method, service, path, { params: p, options });
-    if (!this.cfg.unwrapData) return attach({ ...r.envelope }, r.lastResponse) as unknown as RenidlyList;
-    if (r.error) {
-      if (this.cfg.throwOnApiError) throw r.error;
-      return new RenidlyList([]);
-    }
-    const [items, hasMore, nextParams, nextCursor] = paginator(r.envelope, p);
-    const built = items.map((it) => attach(it as object, r.lastResponse));
-    const pager = (np: Record<string, unknown>) => this.list(service, method, path, np, paginator, options);
-    return new RenidlyList(built, hasMore, nextCursor, nextParams, pager, r.lastResponse);
+    const fetchPage = async (): Promise<RenidlyList> => {
+      const r = await this.transport.request(method, service, path, { params: p, options });
+      if (!this.cfg.unwrapData) return attach({ ...r.envelope }, r.lastResponse) as unknown as RenidlyList;
+      if (r.error) {
+        if (this.cfg.throwOnApiError) throw r.error;
+        return new RenidlyList([]);
+      }
+      const [items, hasMore, nextParams, nextCursor] = paginator(r.envelope, p);
+      const built = items.map((it) => attach(it as object, r.lastResponse));
+      const pager = (np: Record<string, unknown>) => this.list(service, method, path, np, paginator, options);
+      return new RenidlyList(built, hasMore, nextCursor, nextParams, pager, r.lastResponse);
+    };
+    return autoPagingPromise(fetchPage());
   }
 }

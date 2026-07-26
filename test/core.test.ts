@@ -111,6 +111,17 @@ describe("pagination", () => {
     for await (const p of list) names.push(p.first_name);
     expect(names).toEqual(["a", "b", "c"]);
   });
+
+  it("is async-iterable WITHOUT awaiting first (hybrid promise)", async () => {
+    const f = seq(
+      res(200, ok([{ first_name: "a" }], { has_more: true, next_cursor: "c2" })),
+      res(200, ok([{ first_name: "b" }], { has_more: false })),
+    );
+    const names: string[] = [];
+    // note: no `await` before the search — for await drives the hybrid directly
+    for await (const p of client(f).data.people.search({ title: "cto" })) names.push(p.first_name);
+    expect(names).toEqual(["a", "b"]);
+  });
 });
 
 describe("flags", () => {

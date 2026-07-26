@@ -45,3 +45,21 @@ export class RenidlyList<T = any> {
     return this.autoPagingIter();
   }
 }
+
+/**
+ * What every `search`/list method returns: a Promise of the first page that is
+ * ALSO async-iterable. So `await search(...)` gives you one page, and
+ * `for await (const x of search(...))` walks every page — no extra `await`.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type RenidlyListPromise<T = any> = Promise<RenidlyList<T>> & AsyncIterable<T>;
+
+/** Attach auto-paging iteration to a list Promise, yielding the hybrid above. */
+export function autoPagingPromise<T>(promise: Promise<RenidlyList<T>>): RenidlyListPromise<T> {
+  const hybrid = promise as RenidlyListPromise<T>;
+  hybrid[Symbol.asyncIterator] = (): AsyncGenerator<T> =>
+    (async function* () {
+      yield* (await promise).autoPagingIter();
+    })();
+  return hybrid;
+}

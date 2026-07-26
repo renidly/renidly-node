@@ -7,7 +7,7 @@
  * and whether the endpoint pages by cursor (`nextCursor`) or offset.
  */
 import { RenidlyObject } from "../models.js";
-import { RenidlyList } from "../pagination.js";
+import { RenidlyListPromise } from "../pagination.js";
 import { RequestOptions } from "../transport.js";
 import {
   DiscoverOpportunitiesParams,
@@ -43,22 +43,22 @@ export class LivePeople extends BaseResource {
     return this.one(SVC, "GET", "/person/employment-history", { params: { entityId }, options });
   }
   /** List recommendations written for a person. */
-  endorsements(entityId: string, options?: RequestOptions): Promise<RenidlyList> {
+  endorsements(entityId: string, options?: RequestOptions): RenidlyListPromise {
     return this.list(SVC, "GET", "/person/endorsements", { entityId }, livePaginator, options);
   }
   /** Find similar professional profiles (peers). */
-  lookalikes(entityId: string, options?: RequestOptions): Promise<RenidlyList> {
+  lookalikes(entityId: string, options?: RequestOptions): RenidlyListPromise {
     return this.list(SVC, "GET", "/person/lookalikes", { entityId }, livePaginator, options);
   }
   /** List entities a person follows. */
-  interests(entityId: string, options?: RequestOptions): Promise<RenidlyList> {
+  interests(entityId: string, options?: RequestOptions): RenidlyListPromise {
     return this.list(SVC, "GET", "/person/interests", { entityId }, livePaginator, options);
   }
 }
 
 export class LiveActivities extends BaseResource {
   /** List a person's recent posts / activity stream; cursor-paginated. */
-  feed(entityId: string, params: { cursor?: string; start?: number } = {}, options?: RequestOptions): Promise<RenidlyList> {
+  feed(entityId: string, params: { cursor?: string; start?: number } = {}, options?: RequestOptions): RenidlyListPromise {
     return this.list(SVC, "GET", "/activity/feed", { entityId, ...params }, livePaginator, options);
   }
   /** Retrieve one post's full content + top-level comments. */
@@ -66,7 +66,7 @@ export class LiveActivities extends BaseResource {
     return this.one(SVC, "GET", "/activity/details", { params: { entityId }, options });
   }
   /** List the people who reacted to a post; offset-paginated (`start` multiple of 10). */
-  reactions(entityId: string, params: { start?: number } = {}, options?: RequestOptions): Promise<RenidlyList> {
+  reactions(entityId: string, params: { start?: number } = {}, options?: RequestOptions): RenidlyListPromise {
     return this.list(SVC, "GET", "/activity/reactions", { entityId, ...params }, livePaginator, options);
   }
   /** List comments/replies on a post; offset-paginated. `sortBy`: `relevance` | `date_posted`. */
@@ -74,7 +74,7 @@ export class LiveActivities extends BaseResource {
     entityId: string,
     params: { sortBy?: string; count?: number; start?: number } = {},
     options?: RequestOptions,
-  ): Promise<RenidlyList> {
+  ): RenidlyListPromise {
     return this.list(SVC, "GET", "/activity/replies", { entityId, ...params }, livePaginator, options);
   }
   /** List comments authored by a person across posts; cursor-paginated. */
@@ -82,7 +82,7 @@ export class LiveActivities extends BaseResource {
     entityId: string,
     params: { cursor?: string; start?: number } = {},
     options?: RequestOptions,
-  ): Promise<RenidlyList> {
+  ): RenidlyListPromise {
     return this.list(SVC, "GET", "/activity/replies/by-author", { entityId, ...params }, livePaginator, options);
   }
 }
@@ -93,19 +93,19 @@ export class LiveOpportunities extends BaseResource {
     return this.one(SVC, "GET", "/opportunity/details", { params: { opportunityEntityId }, options });
   }
   /** List job postings similar to a given one. */
-  similar(opportunityEntityId: string, options?: RequestOptions): Promise<RenidlyList> {
+  similar(opportunityEntityId: string, options?: RequestOptions): RenidlyListPromise {
     return this.list(SVC, "GET", "/opportunity/similar", { opportunityEntityId }, livePaginator, options);
   }
   /** List "people also viewed" postings. */
-  relatedViews(opportunityEntityId: string, options?: RequestOptions): Promise<RenidlyList> {
+  relatedViews(opportunityEntityId: string, options?: RequestOptions): RenidlyListPromise {
     return this.list(SVC, "GET", "/opportunity/related-views", { opportunityEntityId }, livePaginator, options);
   }
   /** List the hiring-team members for a posting. */
-  hiringTeam(opportunityEntityId: string, options?: RequestOptions): Promise<RenidlyList> {
+  hiringTeam(opportunityEntityId: string, options?: RequestOptions): RenidlyListPromise {
     return this.list(SVC, "GET", "/opportunity/hiring-team", { opportunityEntityId }, livePaginator, options);
   }
   /** List postings created by a person (e.g. a recruiter's open roles). */
-  byPerson(personEntityId: string, params: { count?: number; start?: number } = {}, options?: RequestOptions): Promise<RenidlyList> {
+  byPerson(personEntityId: string, params: { count?: number; start?: number } = {}, options?: RequestOptions): RenidlyListPromise {
     return this.list(SVC, "GET", "/opportunity/by-person", { personEntityId, ...params }, livePaginator, options);
   }
 }
@@ -120,11 +120,11 @@ export class LiveOrganizations extends BaseResource {
     return this.one(SVC, "GET", "/organization/headcount", { params: { id }, options });
   }
   /** List similar companies / peers. */
-  similar(id: string, options?: RequestOptions): Promise<RenidlyList> {
+  similar(id: string, options?: RequestOptions): RenidlyListPromise {
     return this.list(SVC, "GET", "/organization/similar", { id }, livePaginator, options);
   }
   /** List affiliated / subsidiary / showcase pages. */
-  affiliated(id: string, options?: RequestOptions): Promise<RenidlyList> {
+  affiliated(id: string, options?: RequestOptions): RenidlyListPromise {
     return this.list(SVC, "GET", "/organization/affiliated", { id }, livePaginator, options);
   }
   /** Resolve a public company slug to its numeric `id` (resolve once, reuse). */
@@ -132,26 +132,26 @@ export class LiveOrganizations extends BaseResource {
     return this.one(SVC, "GET", "/organization/resolve-slug", { params: { slug }, options });
   }
   /** List a company's recent posts; offset-paginated. */
-  activities(id: string, params: { start?: number } = {}, options?: RequestOptions): Promise<RenidlyList> {
+  activities(id: string, params: { start?: number } = {}, options?: RequestOptions): RenidlyListPromise {
     return this.list(SVC, "GET", "/organization/activities", { id, ...params }, livePaginator, options);
   }
   /** List open postings across organizations (comma-separated ids); offset-paginated. */
-  opportunities(organizationEntityIds: string, params: { start?: number } = {}, options?: RequestOptions): Promise<RenidlyList> {
+  opportunities(organizationEntityIds: string, params: { start?: number } = {}, options?: RequestOptions): RenidlyListPromise {
     return this.list(SVC, "GET", "/organization/opportunities", { organizationEntityIds, ...params }, livePaginator, options);
   }
 }
 
 export class LiveDiscover extends BaseResource {
   /** Search professionals by keyword + filters; offset-paginated. */
-  people(params: DiscoverPeopleParams = {}, options?: RequestOptions): Promise<RenidlyList> {
+  people(params: DiscoverPeopleParams = {}, options?: RequestOptions): RenidlyListPromise {
     return this.list(SVC, "GET", "/discover/people", params as Record<string, unknown>, livePaginator, options);
   }
   /** Search companies by keyword + filters; offset-paginated. */
-  organizations(params: DiscoverOrganizationsParams = {}, options?: RequestOptions): Promise<RenidlyList> {
+  organizations(params: DiscoverOrganizationsParams = {}, options?: RequestOptions): RenidlyListPromise {
     return this.list(SVC, "GET", "/discover/organizations", params as Record<string, unknown>, livePaginator, options);
   }
   /** Search job postings by keyword + rich filters; offset-paginated. */
-  opportunities(params: DiscoverOpportunitiesParams = {}, options?: RequestOptions): Promise<RenidlyList> {
+  opportunities(params: DiscoverOpportunitiesParams = {}, options?: RequestOptions): RenidlyListPromise {
     return this.list(SVC, "GET", "/discover/opportunities", params as Record<string, unknown>, livePaginator, options);
   }
 }

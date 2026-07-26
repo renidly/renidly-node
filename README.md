@@ -70,7 +70,7 @@ const renidly = new Renidly("rnd-...");           // or new Renidly() and set RE
 
 // Retrieve a single record (resolves to null if nothing matched)
 const person = await renidly.data.people.retrieve({ id: "prsn_..." });
-if (person) console.log(person.firstName, person.headline);
+if (person) console.log(person.first_name, person.headline);
 
 // Search with any filters — they autocomplete in your editor
 for await (const p of renidly.data.people.search({ title: "cto", current_only: true })) {
@@ -207,23 +207,29 @@ await renidly.account.routeCosts();          // per-endpoint credit costs (no ke
 
 ## Pagination
 
-Every `search`/list method resolves to a list you can use directly **and** page through transparently with `for await`.
+Every `search`/list method returns a value that is **both** a Promise of the first page **and** async-iterable — so you can `await` it for one page, or `for await` it to walk every page.
 
 ```ts
+// await it → one page (a RenidlyList)
 const page = await renidly.data.people.search({ title: "cto", limit: 25 });
-
 page.length;         // items on this page
 page.data[0];        // index into this page
 page.hasMore;        // is there more?
-for (const p of page) { /* iterate just this page */ }
+for (const p of page) { /* synchronous: iterates just this page */ }
 
-// ...or walk EVERY page lazily (fetches as it goes, one page in memory at a time)
+// ...or for-await it → walk EVERY page lazily (fetches as it goes, one page in memory)
 for await (const person of renidly.data.people.search({ title: "cto" })) {
   console.log(person.headline);
+  // break whenever you like — nothing beyond what you consume is fetched
 }
 ```
 
-The returned `RenidlyList` is itself async-iterable, so `for await` over the search call transparently follows the cursor. Prefer to be explicit? Call `.autoPagingIter()`.
+Prefer an explicit async generator? Await the page, then call `.autoPagingIter()`:
+
+```ts
+const iter = (await renidly.data.people.search({ title: "cto" })).autoPagingIter();
+for await (const person of iter) console.log(person.headline);
+```
 
 ---
 

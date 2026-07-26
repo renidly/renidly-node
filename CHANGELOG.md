@@ -6,6 +6,21 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.2] — 2026-07-26
+
+### Added
+
+- `search`/list methods now return a hybrid that is **both** awaitable and
+  async-iterable: `await search(...)` gives one page, and
+  `for await (const x of search(...))` walks every page — no extra `await`
+  needed. Exposed as the `RenidlyListPromise` type.
+- Runnable `examples/` (quickstart, pagination, batch, errors, TypeScript).
+
+### Fixed
+
+- README examples: corrected a snake_case field access (`first_name`) and
+  clarified the pagination / `autoPagingIter()` usage.
+
 ## [0.1.1] — 2026-07-26
 
 ### Added

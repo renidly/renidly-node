@@ -6,7 +6,7 @@
  */
 import { BatchJob } from "../batch.js";
 import { RenidlyObject } from "../models.js";
-import { RenidlyList } from "../pagination.js";
+import { RenidlyListPromise } from "../pagination.js";
 import { RequestOptions } from "../transport.js";
 import { BaseResource, Paginator } from "./base.js";
 
@@ -53,7 +53,7 @@ export class Emails extends BaseResource {
     kind: "full" | "verified_only",
     params: { cursor?: string } = {},
     options?: RequestOptions,
-  ): Promise<RenidlyList> {
+  ): RenidlyListPromise {
     return this.list(SVC, "GET", "/prospects", { domain, kind, ...params }, prospectsPaginator, options);
   }
 
