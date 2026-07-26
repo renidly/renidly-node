@@ -1,0 +1,42 @@
+name: 🐛 Bug report
+description: Report a problem with the Renidly Node SDK
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to file a report! Please fill in the details below.
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A clear description of the bug and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal reproduction
+      description: The smallest snippet that reproduces the issue. Redact your API key.
+      render: typescript
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Error / output
+      description: The full error output, if any.
+      render: shell
+  - type: input
+    id: sdk-version
+    attributes:
+      label: renidly version
+      placeholder: "0.1.0  (npm ls renidly)"
+    validations:
+      required: true
+  - type: input
+    id: node-version
+    attributes:
+      label: Node version
+      placeholder: "20.11  (node --version)"
+    validations:
+      required: true

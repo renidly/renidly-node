@@ -1,0 +1,59 @@
+{
+  "name": "renidly",
+  "version": "0.1.0",
+  "description": "The official Node.js & TypeScript SDK for the Renidly B2B professional data APIs (Data, Live, Email, Account).",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "author": "Renidly",
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "renidly",
+    "b2b",
+    "professional data",
+    "enrichment",
+    "email verification",
+    "sdk",
+    "typescript"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/renidly/renidly-node#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/renidly/renidly-node.git"
+  },
+  "bugs": {
+    "url": "https://github.com/renidly/renidly-node/issues"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20",
+    "js-yaml": "^5.2.2",
+    "tsup": "^8",
+    "typescript": "^5",
+    "vitest": "^2"
+  }
+}
