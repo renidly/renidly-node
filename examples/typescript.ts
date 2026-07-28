@@ -23,9 +23,10 @@ async function main(): Promise<void> {
     if (++n >= 5) break;
   }
 
-  // HTTP metadata is attached to every response object (non-enumerable).
+  // HTTP metadata + credit accounting is attached to every response object under .meta (non-enumerable).
   const company = await renidly.data.companies.retrieve({ slug: "stripe" });
-  console.log("request id:", company?.lastResponse.requestId);
+  console.log("request id:", company?.meta.requestId);
+  console.log("credits charged:", company?.meta.creditConsumed, "| balance left:", company?.meta.remainingBalance);
 }
 
 main().catch((e) => {

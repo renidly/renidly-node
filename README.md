@@ -39,6 +39,7 @@ console.log(person.headline, company.name, email.deliverable);
 - [Configuration](#configuration)
 - [Automatic rate limiting](#automatic-rate-limiting)
 - [Response objects](#response-objects)
+- [Credits & response metadata](#credits--response-metadata)
 - [Advanced](#advanced)
 - [Requirements & support](#requirements--support)
 
@@ -222,6 +223,9 @@ for await (const person of renidly.data.people.search({ title: "cto" })) {
   console.log(person.headline);
   // break whenever you like — nothing beyond what you consume is fetched
 }
+
+// each page is a separate billed request — see its cost/balance on .meta
+console.log(page.meta.creditConsumed, page.meta.remainingBalance);
 ```
 
 Prefer an explicit async generator? Await the page, then call `.autoPagingIter()`:
@@ -364,9 +368,9 @@ Responses are plain, dynamic, drill-able objects — access any field (nested in
 const t = await renidly.account.tier();
 t.current_tier.name;             // nested access, arbitrarily deep
 
-// HTTP metadata is attached to every object (non-enumerable, so it won't show in JSON.stringify)
-t.lastResponse.statusCode;
-t.lastResponse.requestId;
+// HTTP metadata is attached to every object under .meta (non-enumerable, so it won't show in JSON.stringify)
+t.meta.statusCode;
+t.meta.requestId;
 ```
 
 Using TypeScript and want a shape for a field? Cast it — responses are intentionally loosely typed so new API fields are always reachable:
@@ -375,7 +379,42 @@ Using TypeScript and want a shape for a field? Cast it — responses are intenti
 const name = (t.current_tier as { name: string }).name;
 ```
 
-Prefer the raw envelope? Set `unwrapData: false` and every call resolves to `{ success, statusCode, message, data, ... }`.
+Prefer the raw envelope? Set `unwrapData: false` and every call resolves to `{ success, statusCode, message, data, ... }` — which also carries `.meta`.
+
+---
+
+## Credits & response metadata
+
+Every result carries a non-enumerable `meta` object describing the HTTP call that produced it — including **how many credits it cost and your balance afterward**. It's kept off the response data, so `person.headline` is your data and `person.meta.creditConsumed` is billing info. Being non-enumerable, `meta` never shows up in `JSON.stringify(person)` or `Object.keys(person)`.
+
+```ts
+const person = await renidly.data.people.retrieve({ id: "prsn_06d0d44d…" });
+
+person.meta.creditConsumed;      // -> 1     credits charged for THIS request
+person.meta.remainingBalance;    // -> 19813 balance after the charge
+person.meta.statusCode;          // -> 200
+person.meta.requestId;           // server request id (if provided)
+person.meta.headers;             // raw response headers (record)
+person.meta.body;                // parsed JSON envelope
+person.meta.rawBody;             // raw response text
+person.meta.rawHttp;             // the underlying fetch Response (everything else)
+```
+
+`meta` is on **every** result — single objects, list pages, and each item in a page:
+
+```ts
+const page = await renidly.data.people.search({ title: "cto" });
+page.meta.creditConsumed;        // cost of fetching this page
+page.data[0].meta.remainingBalance;
+```
+
+Notes:
+
+- `creditConsumed` / `remainingBalance` are `undefined` for endpoints that aren't credit-billed (e.g. `account.*`) or when a request wasn't charged (errors, cached hits, zero-result billing).
+- **Result-billed** endpoints report the real dynamic amount — e.g. `emails.prospects("acme.com", { kind: "full" })` returning 18 emails shows `meta.creditConsumed === 18`.
+- **Cached** responses are served free: `meta.creditConsumed === 0` with the balance unchanged.
+- When walking pages with `for await`, each **page** is a separate billed request, so each item reflects **its own page's** `meta`.
+- `.lastResponse` remains as a deprecated alias for `.meta`.
 
 ---
 

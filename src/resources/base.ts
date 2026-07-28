@@ -32,7 +32,7 @@ export class BaseResource {
   }
 
   private applyOne(r: Result): RenidlyObject | null {
-    if (!this.cfg.unwrapData) return attach({ ...r.envelope }, r.lastResponse) as RenidlyObject;
+    if (!this.cfg.unwrapData) return attach({ ...r.envelope }, r.meta) as RenidlyObject;
     if (r.error) {
       if (r.error instanceof NotFoundError) {
         if (this.cfg.throwOnNotFound) throw r.error;
@@ -42,7 +42,7 @@ export class BaseResource {
       return null;
     }
     if (r.data === null || r.data === undefined) return null;
-    return attach(r.data as object, r.lastResponse) as RenidlyObject;
+    return attach(r.data as object, r.meta) as RenidlyObject;
   }
 
   protected list(
@@ -56,15 +56,15 @@ export class BaseResource {
     const p = params ?? {};
     const fetchPage = async (): Promise<RenidlyList> => {
       const r = await this.transport.request(method, service, path, { params: p, options });
-      if (!this.cfg.unwrapData) return attach({ ...r.envelope }, r.lastResponse) as unknown as RenidlyList;
+      if (!this.cfg.unwrapData) return attach({ ...r.envelope }, r.meta) as unknown as RenidlyList;
       if (r.error) {
         if (this.cfg.throwOnApiError) throw r.error;
         return new RenidlyList([]);
       }
       const [items, hasMore, nextParams, nextCursor] = paginator(r.envelope, p);
-      const built = items.map((it) => attach(it as object, r.lastResponse));
+      const built = items.map((it) => attach(it as object, r.meta));
       const pager = (np: Record<string, unknown>) => this.list(service, method, path, np, paginator, options);
-      return new RenidlyList(built, hasMore, nextCursor, nextParams, pager, r.lastResponse);
+      return new RenidlyList(built, hasMore, nextCursor, nextParams, pager, r.meta);
     };
     return autoPagingPromise(fetchPage());
   }

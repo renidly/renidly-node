@@ -17,7 +17,7 @@ import {
   RenidlyError,
   ServiceUnavailableError,
 } from "./errors.js";
-import { LastResponse } from "./models.js";
+import { BALANCE_HEADER, CONSUMED_HEADER, ResponseMeta, creditHeader } from "./models.js";
 import { version } from "./version.js";
 
 const NOT_FOUND_CODES = new Set(["1010", "1020", "1030", "1040", "1090"]);
@@ -34,7 +34,7 @@ export interface Result {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any;
   envelope: Record<string, unknown>;
-  lastResponse: LastResponse;
+  meta: ResponseMeta;
   error?: RenidlyError;
 }
 
@@ -51,11 +51,11 @@ function requestId(headers: Record<string, string>): string | undefined {
   return headers["x-request-id"] ?? headers["x-renidly-request-id"];
 }
 
-function mapError(status: number, env: Record<string, unknown>, last: LastResponse): RenidlyError {
+function mapError(status: number, env: Record<string, unknown>, meta: ResponseMeta): RenidlyError {
   const msg = (env.message as string) || `HTTP ${status}`;
   const code = env.error_code as string | undefined;
   const errors = env.errors && typeof env.errors === "object" ? (env.errors as Record<string, unknown>) : {};
-  const opts = { status, errorCode: code, errors, requestId: last.requestId };
+  const opts = { status, errorCode: code, errors, requestId: meta.requestId };
   const low = msg.toLowerCase();
   if (status === 402 || code === "1080" || low.includes("insufficient") || low.includes("enough credit"))
     return new InsufficientCreditsError(msg, opts);
@@ -76,17 +76,32 @@ function mapError(status: number, env: Record<string, unknown>, last: LastRespon
 async function parse(resp: Response): Promise<Result> {
   const headers: Record<string, string> = {};
   resp.headers.forEach((v, k) => (headers[k] = v));
-  const last: LastResponse = { statusCode: resp.status, headers, requestId: requestId(headers) };
+  let rawBody = "";
+  try {
+    rawBody = await resp.text();
+  } catch {
+    // body stream unreadable / already consumed
+  }
   let env: Record<string, unknown>;
   try {
-    const j = await resp.json();
+    const j = JSON.parse(rawBody);
     env = j && typeof j === "object" ? (j as Record<string, unknown>) : { success: resp.ok, data: j };
   } catch {
-    env = { success: false, message: `HTTP ${resp.status}` };
+    env = { success: false, message: rawBody.slice(0, 500) || `HTTP ${resp.status}` };
   }
+  const meta: ResponseMeta = {
+    statusCode: resp.status,
+    headers,
+    requestId: requestId(headers),
+    creditConsumed: creditHeader(headers, CONSUMED_HEADER),
+    remainingBalance: creditHeader(headers, BALANCE_HEADER),
+    body: env,
+    rawBody,
+    rawHttp: resp,
+  };
   const ok = (env.success ?? resp.ok) === true && resp.ok;
-  if (ok) return { ok: true, data: env.data, envelope: env, lastResponse: last };
-  return { ok: false, data: env.data, envelope: env, lastResponse: last, error: mapError(resp.status, env, last) };
+  if (ok) return { ok: true, data: env.data, envelope: env, meta };
+  return { ok: false, data: env.data, envelope: env, meta, error: mapError(resp.status, env, meta) };
 }
 
 function isRetryable(err: RenidlyError | undefined): boolean {

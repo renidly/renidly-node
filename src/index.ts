@@ -6,7 +6,7 @@ export { Renidly } from "./client.js";
 export type { RenidlyConfig } from "./config.js";
 export { RenidlyList } from "./pagination.js";
 export type { RenidlyListPromise } from "./pagination.js";
-export type { APIResponse, LastResponse, RenidlyObject } from "./models.js";
+export type { APIResponse, ResponseMeta, LastResponse, RenidlyObject } from "./models.js";
 export { BatchJob } from "./batch.js";
 export type { BatchResult, PollOptions } from "./batch.js";
 export type { RequestOptions } from "./transport.js";

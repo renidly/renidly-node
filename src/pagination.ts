@@ -5,7 +5,7 @@
  * (or `list.autoPagingIter()`) walks EVERY page, fetching lazily. `.data`,
  * `.hasMore`, and `.nextCursor` are there for manual control.
  */
-import { LastResponse } from "./models.js";
+import { ResponseMeta } from "./models.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export class RenidlyList<T = any> {
@@ -16,8 +16,14 @@ export class RenidlyList<T = any> {
     public readonly nextCursor: string | null = null,
     private readonly _nextParams: Record<string, unknown> | null = null,
     private readonly _pager: ((p: Record<string, unknown>) => Promise<RenidlyList<T>>) | null = null,
-    public readonly lastResponse?: LastResponse,
+    /** HTTP metadata (status, headers, credits, body, rawHttp) for THIS page. */
+    public readonly meta?: ResponseMeta,
   ) {}
+
+  /** Deprecated alias for {@link meta}. */
+  get lastResponse(): ResponseMeta | undefined {
+    return this.meta;
+  }
 
   /** Number of items on the current page. */
   get length(): number {

@@ -47,6 +47,6 @@ export class Renidly {
     args: { service?: Service; params?: Record<string, unknown>; body?: unknown; options?: RequestOptions } = {},
   ): Promise<APIResponse> {
     const r = await this.transport.request(method, args.service ?? "data", path, args);
-    return attach({ ...r.envelope }, r.lastResponse) as unknown as APIResponse;
+    return attach({ ...r.envelope }, r.meta) as unknown as APIResponse;
   }
 }
