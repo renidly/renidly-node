@@ -265,6 +265,17 @@ export interface PeopleSearchParams {
   skill_count_min?: number;
   skill_count_max?: number;
   speaks_language?: string;
+  follower_count_min?: number;
+  company_size_min?: number;
+  company_size_max?: number;
+  industry?: string;
+  experience_min_years?: number;
+  function?: string;
+  function_min_years?: number;
+  description?: string;
+  exclude_titles?: string;
+  exclude_organization_slugs?: string;
+  exclude_industries?: string;
   cursor?: string;
   limit?: number;
 }
