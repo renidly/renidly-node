@@ -6,6 +6,25 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.1] — 2026-09-26
+
+### Fixed
+
+- `autoRateLimit` now reads the per-minute limit for enterprise accounts too
+  (top-level `limit_per_minute`; `current_tier` is `null` for them). Previously
+  an enterprise account whose key did not start with `enterprise-` silently fell
+  back to 1 request/minute.
+- An undeterminable limit no longer throttles to 1 request/minute: the SDK emits
+  a `RenidlyRateLimitWarning` and skips client-side throttling (server 429s are
+  still retried) until a later refresh succeeds.
+- The tier endpoint is no longer re-fetched on every request while the limit is
+  unknown, and concurrent first calls share one tier fetch.
+
+### Changed
+
+- `enterprise-` keys no longer require `rateLimitPerMinute`; the fixed limit is
+  read from the account. The option remains as an override.
+
 ## [0.1.2] — 2026-07-26
 
 ### Added

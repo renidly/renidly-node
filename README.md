@@ -339,7 +339,7 @@ const renidly = new Renidly("rnd-...", {
 | `throwOnNotFound` | `false` | `null` vs `NotFoundError` on empty lookups. |
 | `throwOnApiError` | `true` | Throw vs return `null` on API errors. |
 | `autoRateLimit` | `false` | Self-throttle to your tier's limit. |
-| `rateLimitPerMinute` | — | Fixed limit (required for enterprise keys). |
+| `rateLimitPerMinute` | — | Override the limit read from your account. |
 | `rateLimitSafety` | `1.0` | Fraction of the limit to target (e.g. `0.9`). |
 
 ---
@@ -349,14 +349,16 @@ const renidly = new Renidly("rnd-...", {
 Turn it on and the SDK keeps you under your per-minute limit automatically — no limiter to build.
 
 ```ts
-// Regular key: the limit is read from your tier and refreshed automatically.
+// Any key (tiered or enterprise): the limit is read from your account.
 new Renidly("rnd-...", { autoRateLimit: true });
 
-// Enterprise key: the limit is fixed — supply it.
-new Renidly("enterprise-...", { autoRateLimit: true, rateLimitPerMinute: 550 });
+// Optional: override it with a fixed limit.
+new Renidly("rnd-...", { autoRateLimit: true, rateLimitPerMinute: 550 });
 ```
 
 It uses a sliding 60-second window so you never exceed the limit, and re-reads your tier after a `429`.
+If the limit can't be determined, the SDK emits a `RenidlyRateLimitWarning` and does not throttle
+client-side (server `429`s are still retried) until a later refresh succeeds.
 
 ---
 

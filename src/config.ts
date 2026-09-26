@@ -40,7 +40,7 @@ export interface RenidlyConfig {
   throwOnApiError?: boolean;
   /** Throttle requests to your per-minute limit automatically. Default `false`. */
   autoRateLimit?: boolean;
-  /** Fixed per-minute limit. REQUIRED for enterprise keys; optional override otherwise. */
+  /** Fixed per-minute limit. Optional: by default it is read from your account (tier limit, or the fixed enterprise limit). */
   rateLimitPerMinute?: number;
   /** Fraction of the limit to target (e.g. `0.9` leaves headroom). Default `1.0`. */
   rateLimitSafety?: number;
@@ -100,6 +100,3 @@ export function authHeaderFor(service: Service): string {
   return SERVICES[service].header;
 }
 
-export function isEnterprise(apiKey: string | undefined): boolean {
-  return !!apiKey && apiKey.startsWith("enterprise-");
-}

@@ -163,8 +163,8 @@ describe("batch", () => {
 });
 
 describe("rate limiter", () => {
-  it("enterprise key requires a supplied limit", () => {
-    expect(() => new Renidly("enterprise-x", { autoRateLimit: true })).toThrow();
+  it("enterprise key no longer requires a supplied limit", () => {
+    expect(() => new Renidly("enterprise-x", { autoRateLimit: true })).not.toThrow();
   });
   it("enterprise fixed limit is accepted", () => {
     expect(() => new Renidly("enterprise-x", { autoRateLimit: true, rateLimitPerMinute: 550 })).not.toThrow();
