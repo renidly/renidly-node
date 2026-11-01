@@ -11,6 +11,7 @@ export const SERVICES = {
   data: { prefix: "/api/data/v1", header: "X-renidly-apikey" },
   live: { prefix: "/api/v2", header: "X-renidly-apikey" },
   emails: { prefix: "/api/emails/v1", header: "X-renidly-apikey" },
+  phones: { prefix: "/api/phones/v1", header: "X-renidly-apikey" },
   account: { prefix: "/api/panel", header: "X-AUTHAPI-Key" },
 } as const;
 

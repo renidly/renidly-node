@@ -1,7 +1,7 @@
 /**
  * The public client. All methods are async (Promise-based); the same client
  * works in Node 18+ and the browser. Product namespaces hang off it:
- * `renidly.data`, `renidly.live`, `renidly.emails`, `renidly.account`.
+ * `renidly.data`, `renidly.live`, `renidly.emails`, `renidly.phones`, `renidly.account`.
  *
  * @example
  * import { Renidly } from "renidly";
@@ -15,6 +15,7 @@ import { Account } from "./resources/account.js";
 import { Data } from "./resources/data.js";
 import { Emails } from "./resources/emails.js";
 import { Live } from "./resources/live.js";
+import { Phones } from "./resources/phones.js";
 import { RequestOptions, Transport } from "./transport.js";
 
 export class Renidly {
@@ -24,6 +25,7 @@ export class Renidly {
   readonly data: Data;
   readonly emails: Emails;
   readonly live: Live;
+  readonly phones: Phones;
 
   /**
    * @param apiKey Your API key. Overrides `config.apiKey`; falls back to the
@@ -38,6 +40,7 @@ export class Renidly {
     this.data = new Data(this.transport, cfg);
     this.emails = new Emails(this.transport, cfg);
     this.live = new Live(this.transport, cfg);
+    this.phones = new Phones(this.transport, cfg);
   }
 
   /** Escape hatch: call any endpoint directly; resolves the raw envelope. */

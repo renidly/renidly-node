@@ -6,6 +6,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.4.0] — 2026-11-02
+
+### Added
+
+- `phones` namespace for the Phone API: `phones.find(url)` returns a person's
+  phone numbers from their profile URL or username, and
+  `phones.reverse(phone, { country })` returns the people behind a number.
+
 ## [0.3.0] — 2026-09-26
 
 ### Added
@@ -89,7 +97,8 @@ Initial public release.
 - Optional built-in client-side rate limiter (`autoRateLimit`).
 - Zero runtime dependencies; native `fetch`; ships both ESM and CommonJS.
 
-[Unreleased]: https://github.com/renidly/renidly-node/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/renidly/renidly-node/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/renidly/renidly-node/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/renidly/renidly-node/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/renidly/renidly-node/compare/v0.1.2...v0.2.1
 [0.1.2]: https://github.com/renidly/renidly-node/compare/v0.1.1...v0.1.2

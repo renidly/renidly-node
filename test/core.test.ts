@@ -4,6 +4,7 @@ import {
   InsufficientCreditsError,
   InvalidRequestError,
   NotFoundError,
+  PermissionDeniedError,
   RateLimitError,
   Renidly,
   RenidlyList,
@@ -159,6 +160,28 @@ describe("batch", () => {
     expect(job.id).toBe("j1");
     expect(r.status).toBe("completed");
     expect(r.results.map((x) => x.email).sort()).toEqual(["a@x.com", "b@y.com"]);
+  });
+});
+
+describe("phones", () => {
+  it("find calls /api/phones/v1/find with the url", async () => {
+    const f = seq(res(200, ok({ found: true, person: { full_name: "A B" }, phones: [{ phone: "+16502530000" }] })));
+    const r = await client(f).phones.find("ryanroslansky");
+    expect(f.calls[0].url).toBe("https://renidly.com/api/phones/v1/find?url=ryanroslansky");
+    expect(r?.found).toBe(true);
+  });
+  it("reverse sends country only when given", async () => {
+    const empty = () => res(200, ok({ phone: "+16502530000", found: false, candidates: [] }));
+    const f = seq(empty(), empty());
+    const c = client(f);
+    await c.phones.reverse("+1 650 253 0000");
+    await c.phones.reverse("020 7946 0958", { country: "GB" });
+    expect(f.calls[0].url).toBe("https://renidly.com/api/phones/v1/reverse?phone=%2B1+650+253+0000");
+    expect(f.calls[1].url).toBe("https://renidly.com/api/phones/v1/reverse?phone=020+7946+0958&country=GB");
+  });
+  it("opted-out contact raises PermissionDeniedError", async () => {
+    const f = seq(res(403, fail(403, "This contact has opted out and their information cannot be returned.", "OPTED_OUT")));
+    await expect(client(f).phones.find("x")).rejects.toBeInstanceOf(PermissionDeniedError);
   });
 });
 
