@@ -146,6 +146,7 @@ Resolve a single subject or run a discovery search.
 // People — resolve a public handle to a stable id once, then reuse it
 const eid = (await renidly.live.people.resolveHandle("williamhgates")).entityId;
 await renidly.live.people.enrich({ entityId: eid });    // or { handle: "..." }
+await renidly.live.people.enrichBulk([eid, ...]);       // up to 100 per call
 await renidly.live.people.employmentHistory(eid);
 await renidly.live.people.endorsements(eid);
 await renidly.live.people.lookalikes(eid);
@@ -154,6 +155,7 @@ await renidly.live.people.interests(eid);
 // Organizations
 const oid = (await renidly.live.organizations.resolveSlug("google")).id;
 await renidly.live.organizations.enrich(oid);
+await renidly.live.organizations.enrichBulk([oid, ...]); // up to 100 per call
 await renidly.live.organizations.headcount(oid);
 await renidly.live.organizations.similar(oid);
 await renidly.live.organizations.affiliated(oid);

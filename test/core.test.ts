@@ -185,6 +185,21 @@ describe("phones", () => {
   });
 });
 
+describe("live bulk enrich", () => {
+  it("joins ids with commas", async () => {
+    const f = seq(
+      res(200, ok({ requested: 2, count: 1, profiles: [{ entityId: "ACoAA1" }], notFound: ["ACoAA2"] })),
+      res(200, ok({ requested: 2, count: 2, organizations: [], notFound: [] })),
+    );
+    const c = client(f);
+    const r = await c.live.people.enrichBulk(["ACoAA1", "ACoAA2"]);
+    await c.live.organizations.enrichBulk(["1441", "1035"]);
+    expect(f.calls[0].url).toBe("https://renidly.com/api/v2/person/enrich-bulk?entityIds=ACoAA1%2CACoAA2");
+    expect(f.calls[1].url).toBe("https://renidly.com/api/v2/organization/enrich-bulk?ids=1441%2C1035");
+    expect(r?.notFound).toEqual(["ACoAA2"]);
+  });
+});
+
 describe("rate limiter", () => {
   it("enterprise key no longer requires a supplied limit", () => {
     expect(() => new Renidly("enterprise-x", { autoRateLimit: true })).not.toThrow();

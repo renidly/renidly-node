@@ -34,6 +34,15 @@ export class LivePeople extends BaseResource {
   enrich(args: { entityId?: string; handle?: string }, options?: RequestOptions): Promise<RenidlyObject | null> {
     return this.one(SVC, "GET", "/person/enrich", { params: { entityId: args.entityId, handle: args.handle }, options });
   }
+  /**
+   * Retrieve up to 100 full live profiles in one call. Resolves `{ requested,
+   * count, profiles, notFound }`; profiles come in any order (match by
+   * `entityId`). One credit per unique id, found or not; one malformed id
+   * rejects the whole batch, free.
+   */
+  enrichBulk(entityIds: string[], options?: RequestOptions): Promise<RenidlyObject | null> {
+    return this.one(SVC, "GET", "/person/enrich-bulk", { params: { entityIds: entityIds.join(",") }, options });
+  }
   /** Resolve a public handle to a stable `entityId` (do it once, reuse it). */
   resolveHandle(handle: string, options?: RequestOptions): Promise<RenidlyObject | null> {
     return this.one(SVC, "GET", "/person/resolve-handle", { params: { handle }, options });
@@ -114,6 +123,15 @@ export class LiveOrganizations extends BaseResource {
   /** Retrieve one company's full live profile (numeric `id`). */
   enrich(id: string, options?: RequestOptions): Promise<RenidlyObject | null> {
     return this.one(SVC, "GET", "/organization/enrich", { params: { id }, options });
+  }
+  /**
+   * Retrieve up to 100 full company profiles in one call (numeric ids).
+   * Resolves `{ requested, count, organizations, notFound }`; organizations
+   * come in any order (match by `id`). Each unique id is billed like `enrich`,
+   * found or not; one malformed id rejects the whole batch, free.
+   */
+  enrichBulk(ids: string[], options?: RequestOptions): Promise<RenidlyObject | null> {
+    return this.one(SVC, "GET", "/organization/enrich-bulk", { params: { ids: ids.join(",") }, options });
   }
   /** Get a company's employee count + distribution buckets. */
   headcount(id: string, options?: RequestOptions): Promise<RenidlyObject | null> {
