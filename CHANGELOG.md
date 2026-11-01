@@ -6,6 +6,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.4.1] — 2026-11-02
+
+### Changed
+
+- Regenerated the typed parameters from the current API specs:
+  `institutions.alumni` accepts `institution_id` (an `inst_…` id, which wins
+  over the institution name).
+
 ## [0.4.0] — 2026-11-02
 
 ### Added
@@ -97,7 +105,8 @@ Initial public release.
 - Optional built-in client-side rate limiter (`autoRateLimit`).
 - Zero runtime dependencies; native `fetch`; ships both ESM and CommonJS.
 
-[Unreleased]: https://github.com/renidly/renidly-node/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/renidly/renidly-node/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/renidly/renidly-node/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/renidly/renidly-node/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/renidly/renidly-node/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/renidly/renidly-node/compare/v0.1.2...v0.2.1

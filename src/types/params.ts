@@ -136,6 +136,7 @@ export interface FindParams {
 }
 
 export interface InstitutionsAlumniParams {
+  institution_id?: string;
   current_only?: boolean;
   degree?: string;
   field_of_study?: string;
@@ -200,6 +201,10 @@ export interface OrganizationActivitiesParams {
 
 export interface OrganizationAffiliatedParams {
   id?: string;
+}
+
+export interface OrganizationEnrichBulkParams {
+  ids?: string;
 }
 
 export interface OrganizationEnrichParams {
@@ -286,6 +291,10 @@ export interface PersonEmploymentHistoryParams {
 
 export interface PersonEndorsementsParams {
   entityId?: string;
+}
+
+export interface PersonEnrichBulkParams {
+  entityIds?: string;
 }
 
 export interface PersonEnrichParams {
